@@ -10,10 +10,12 @@ import edu.nju.model.service.StatisticModelService;
 import edu.nju.model.state.GameResultState;
 import edu.nju.model.state.GameState;
 import edu.nju.model.vo.GameVO;
+import edu.nju.view.TimeLabel;
 
 public class GameModelImpl extends BaseModel implements GameModelService{
 	
 	private StatisticModelService statisticModel;
+
 	private ChessBoardModelService chessBoardModel;
 	
 	private List<GameLevel> levelList;
@@ -47,6 +49,7 @@ public class GameModelImpl extends BaseModel implements GameModelService{
 		// TODO Auto-generated method stub
 		gameState = GameState.RUN;
 		startTime = Calendar.getInstance().getTimeInMillis();
+		TimeLabel.setRun(true);
 		
 		GameLevel gl = null;
 		for(GameLevel tempLevel : levelList){
@@ -71,17 +74,23 @@ public class GameModelImpl extends BaseModel implements GameModelService{
 	}
 	
 	@Override
-	public boolean gameOver(GameResultState result) {
+	public boolean gameOver(GameResultState result,boolean isClient) {
 		// TODO Auto-generated method stub
-		
+		TimeLabel.setRun(false);
 		this.gameState = GameState.OVER;
 		this.gameResultStae = result;
+		if(isClient){
+			if(result.equals(GameResultState.FAIL)){
+				this.gameResultStae = GameResultState.SUCCESS;
+			}else if(result.equals(GameResultState.SUCCESS)){
+				this.gameResultStae = GameResultState.FAIL;
+			}
+		}
 		this.time = (int)(Calendar.getInstance().getTimeInMillis() - startTime)/1000;
-		
-		this.statisticModel.recordStatistic(result, time);
+		this.statisticModel.recordStatistic(result, time, level);
 		
 		super.updateChange(new UpdateMessage("end",this.convertToDisplayGame()));		
-		return false;
+		return true;
 	}
 
 	@Override
@@ -103,12 +112,33 @@ public class GameModelImpl extends BaseModel implements GameModelService{
 	}
 	
 	private GameVO convertToDisplayGame(){
-		return new GameVO(gameState, width, height,level, gameResultStae, time);
+		GameVO gamevo = new GameVO(gameState, width, height,level, gameResultStae, time);
+		return gamevo;
 	}
 
 	@Override
 	public List<GameLevel> getGameLevel() {
-		// TODO Auto-generated method stub
 		return this.levelList;
+	}
+	
+	@Override
+	public int getTime(){
+		return (int)(Calendar.getInstance().getTimeInMillis() - startTime)/1000;
+	}
+	
+	public StatisticModelService getStatisticModel() {
+		return statisticModel;
+	}
+
+	public void setStatisticModel(StatisticModelService statisticModel) {
+		this.statisticModel = statisticModel;
+	}
+
+	public ChessBoardModelService getChessBoardModel() {
+		return chessBoardModel;
+	}
+
+	public void setChessBoardModel(ChessBoardModelService chessBoardModel) {
+		this.chessBoardModel = chessBoardModel;
 	}
 }

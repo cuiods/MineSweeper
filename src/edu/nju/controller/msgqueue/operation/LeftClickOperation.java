@@ -15,7 +15,12 @@ public class LeftClickOperation extends MineOperation{
 	public void execute() {
 		// TODO Auto-generated method stub
 		ChessBoardModelService chess = OperationQueue.getChessBoardModel();
-		chess.excavate(x, y);
+		if(isClient){
+			chess.excavate(x, y, true);
+		}else{
+			chess.excavate(x, y);
+		}
+		
 	}
 
 }

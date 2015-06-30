@@ -44,12 +44,17 @@ public class CoreListener implements MouseListener, ActionListener {
 		if (e.getClickCount() > 2) return;
 		
 		if(e.getButton()==MouseEvent.BUTTON3){//右键相应雷格
+			MyButton button = (MyButton) e.getSource();
+			Location location = button.getMyLocation();
+			mouseController.handleRightClick(location.x, location.y);
 		 
 		}else if(e.getButton()==MouseEvent.BUTTON1){//左键相应雷格
 			if(e.getClickCount()==2){//双击左键
-
+				MyButton button = (MyButton) e.getSource();
+				Location location = button.getMyLocation();
+				mouseController.handleDoubleClick(location.x, location.y);
 			}else{//单击左键					
-				System.out.println("监听到了单击!!!!!!");
+				//System.out.println("监听到了单击!!!!!!");
 				MyButton button = (MyButton) e.getSource();
 				Location location = button.getMyLocation();
 				mouseController.handleLeftClick(location.x, location.y);

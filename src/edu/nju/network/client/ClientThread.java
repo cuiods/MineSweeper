@@ -38,6 +38,7 @@ public class ClientThread extends Thread {
 			} catch(SocketException se){
 				System.out.println("socket connection is closed!!!");
 				this.close();
+				Configure.isClient = false;
 				break;
 			}catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -62,6 +63,7 @@ public class ClientThread extends Thread {
 			reader.close();
 			out.close();
 			server.close();
+			Configure.isClient = false;
 			this.interrupt();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

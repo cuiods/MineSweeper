@@ -11,12 +11,13 @@ import edu.nju.model.state.BlockState;
 import edu.nju.model.state.GameResultState;
 import edu.nju.model.state.GameState;
 import edu.nju.model.vo.BlockVO;
+import edu.nju.network.Configure;
 
 public class ChessBoardModelImpl extends BaseModel implements ChessBoardModelService{
 	
 	private GameModelService gameModel;
 	private ParameterModelService parameterModel;
-	
+
 	private BlockPO[][] blockMatrix;
 
 	
@@ -27,73 +28,173 @@ public class ChessBoardModelImpl extends BaseModel implements ChessBoardModelSer
 	@Override
 	public boolean initialize(int width, int height, int mineNum) {
 		// TODO Auto-generated method stub
-		/********************简单示例初始化方法，待完善********************/
+		
 		blockMatrix = new BlockPO[width][height];
 		setBlock(mineNum);
 		
 		this.parameterModel.setMineNum(mineNum);
-		/***********请在删除上述内容的情况下，完成自己的内容****************/
+		this.parameterModel.setFlagNum(0);
 		
 		this.printBlockMatrix();
 		
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean excavate(int x, int y) {
-		// TODO Auto-generated method stub
-		/********************简单示例挖开方法，待完善********************/
+
 		if(blockMatrix == null)
 			return false;
 		
 		List<BlockPO> blocks = new ArrayList<BlockPO>();
 		BlockPO block = blockMatrix[x][y];
-		
+		if(block.getState() == BlockState.FLAG){
+			this.parameterModel.addMineNum();
+		}
 		block.setState(BlockState.CLICK);
 		blocks.add(block);
 		
 		GameState gameState = GameState.RUN;
 		if(block.isMine()){
 			gameState = GameState.OVER;
-			this.gameModel.gameOver(GameResultState.FAIL);
+			this.gameModel.gameOver(GameResultState.FAIL,false);
+		}
+		
+		int testNum = 0;
+		for(int i = 0; i < blockMatrix.length; i++){
+			for(int j = 0; j < blockMatrix[0].length; j++){
+				if(blockMatrix[i][j].getState().equals(BlockState.UNCLICK)&&!blockMatrix[i][j].isMine()){
+					testNum++;
+				}
+			}
+		}
+		if(testNum==0){
+			if(Configure.isClient||Configure.isServer){
+				gameState = GameState.OVER;
+				if(whetherServerWin()){
+					this.gameModel.gameOver(GameResultState.SUCCESS,false);
+				}else{
+					this.gameModel.gameOver(GameResultState.SUCCESS,true);
+				}
+			}else{
+				gameState = GameState.OVER;
+				this.gameModel.gameOver(GameResultState.SUCCESS,false);
+			}
 		}
 		
 		super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));			
-		/***********请在删除上述内容的情况下，完成自己的内容****************/
+
+		if(block.getMineNum()==0){
+			for(int i = x-1; i <= x+1; i++){
+				for(int j = y-1; j <= y+1; j++){
+					if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.UNCLICK){
+						excavate(i, j);
+					}
+				}
+			}
+		}
 		return true;
 	}
+	
 	
 	@Override
 	public boolean mark(int x, int y) {
 		// TODO Auto-generated method stub
-		/********************简单示例标记方法，待完善********************/
 		if(blockMatrix == null)
 			return false;
 		
-		List<BlockPO> blocks = new ArrayList<BlockPO>();
-		BlockPO block = blockMatrix[x][y];
-		 
-		BlockState state = block.getState();
-		if(state == BlockState.UNCLICK){
-			block.setState(BlockState.FLAG);
-			this.parameterModel.minusMineNum();
-		}
-		else if(state == BlockState.FLAG){
-			block.setState(BlockState.UNCLICK);
-			this.parameterModel.addMineNum();
+		if(this.parameterModel.canMark()){
+			GameState gameState = GameState.RUN;
+			List<BlockPO> blocks = new ArrayList<BlockPO>();
+			BlockPO block = blockMatrix[x][y];
+			 
+			BlockState state = block.getState();
+			if(state == BlockState.UNCLICK){
+				block.setState(BlockState.FLAG);
+				this.parameterModel.minusMineNum();
+				this.parameterModel.addFlagNum();
+				
+			}
+			else if(state == BlockState.FLAG){
+				block.setState(BlockState.UNCLICK);
+				this.parameterModel.addMineNum();
+			}
+			
+			blocks.add(block);
+			
+			//whether win
+			int testNum = 0;
+			for(int i = 0; i < blockMatrix.length; i++){
+				for(int j = 0; j < blockMatrix[0].length; j++){
+					if(blockMatrix[i][j].isMine()&&(blockMatrix[i][j].getState().equals(BlockState.FLAG)||blockMatrix[i][j].getState()==BlockState.FLAG2)){
+						testNum++;
+					}
+				}
+			}
+			if(testNum==parameterModel.getMineNum()){
+				if(Configure.isClient||Configure.isServer){
+					gameState = GameState.OVER;
+					if(whetherServerWin()){
+						this.gameModel.gameOver(GameResultState.SUCCESS,false);
+					}else{
+						this.gameModel.gameOver(GameResultState.SUCCESS,true);
+					}
+				}else{
+					gameState = GameState.OVER;
+					this.gameModel.gameOver(GameResultState.SUCCESS,false);
+				}
+			}
+			if(Configure.isServer&&!block.isMine()){
+				gameState = GameState.OVER;
+				this.gameModel.gameOver(GameResultState.FAIL,false);
+			}
+			
+			super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));
+			return true;
 		}
 		
-		blocks.add(block);	
-		super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, GameState.RUN)));
-		/***********请在删除上述内容的情况下，完成自己的内容****************/
-		
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean quickExcavate(int x, int y) {
 		// TODO Auto-generated method stub
 		/***********请在此处完成快速挖开方法实现****************/
+		if(blockMatrix == null)
+			return false;
+		List<BlockPO> blocks = new ArrayList<BlockPO>();
+		BlockPO block = blockMatrix[x][y];
+		GameState gameState = GameState.RUN;
+		if(block.getState()==BlockState.CLICK){
+			int flagNum = 0;
+			for(int i = x-1;i <= x+1;i++){
+				for(int j = y-1; j <= y+1; j++){
+					if(!(i==x&&j==y)){
+						if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.FLAG){
+							flagNum++;
+						}
+					}
+				}
+			}
+			if(block.getMineNum()==flagNum){
+				for(int i = x-1;i <= x+1;i++){
+					for(int j = y-1; j <= y+1; j++){
+						if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.UNCLICK){
+//							blockMatrix[i][j].setState(BlockState.CLICK);
+//							blocks.add(blockMatrix[i][j]);
+//							
+//							if(blockMatrix[i][j].isMine()){
+//								this.gameModel.gameOver(GameResultState.FAIL);
+//								gameState = GameState.OVER;
+//							}
+							excavate(i, j);
+						}
+					}
+				}
+				super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));
+				return true;
+			}
+		}
 		
 		return false;
 	}
@@ -117,24 +218,32 @@ public class ChessBoardModelImpl extends BaseModel implements ChessBoardModelSer
 			for (int j = 0 ; j< height; j++){
 				blockMatrix[i][j] = new BlockPO(i,j);
 				//放置雷，并设定block附近雷数，现有放置方法为固定方法，请添加随机实现
-				index ++;
-				if(index == 2){
-					if(mineNum>0){
-						if(i>3&&j>3){
-							blockMatrix[i-1][j-1].setMine(true);
-						
-							addMineNum(i-1,j-1);
-							mineNum--;
-						}
-					}
-					index = 0;
-				}
-				
+//				index ++;
+//				if(index == 2){
+//					if(mineNum>0){
+//						if(i>3&&j>3){
+//							blockMatrix[i-1][j-1].setMine(true);
+//						
+//							addMineNum(i-1,j-1);
+//							mineNum--;
+//						}
+//					}
+//					index = 0;
+//				}				
+			}
+		}
+		while(mineNum>0){
+			int ramI = (int)(Math.random()*width);
+			int ramJ = (int)(Math.random()*height);
+			if(!blockMatrix[ramI][ramJ].isMine()){
+				blockMatrix[ramI][ramJ].setMine(true);
+				addMineNum(ramI, ramJ);
+				mineNum--;
 			}
 		}
 		
 		
-		return false;
+		return true;
 	}
 	
 	
@@ -197,5 +306,183 @@ public class ChessBoardModelImpl extends BaseModel implements ChessBoardModelSer
 			}
 			System.out.println();
 		}
+	}
+	
+	public ParameterModelService getParameterModel() {
+		return parameterModel;
+	}
+
+	public void setParameterModel(ParameterModelService parameterModel) {
+		this.parameterModel = parameterModel;
+	}
+
+	@Override
+	public boolean mark(int x, int y, boolean isClient) {
+
+		// TODO Auto-generated method stub
+		if(blockMatrix == null)
+			return false;
+		
+		if(this.parameterModel.canMark()){
+			GameState gameState = GameState.RUN;
+			List<BlockPO> blocks = new ArrayList<BlockPO>();
+			BlockPO block = blockMatrix[x][y];
+			 
+			BlockState state = block.getState();
+			if(state == BlockState.UNCLICK){
+				block.setState(BlockState.FLAG2);
+				this.parameterModel.minusMineNum();
+				this.parameterModel.addFlagNum2();
+			}
+			else if(state == BlockState.FLAG2){
+				block.setState(BlockState.UNCLICK);
+				this.parameterModel.addMineNum();
+			}
+			
+			blocks.add(block);
+			
+			//whether win
+			int testNum = 0;
+			for(int i = 0; i < blockMatrix.length; i++){
+				for(int j = 0; j < blockMatrix[0].length; j++){
+					if(blockMatrix[i][j].isMine()&&blockMatrix[i][j].getState().equals(BlockState.FLAG)){
+						testNum++;
+					}
+				}
+			}
+			if(testNum==parameterModel.getMineNum()){
+				if(Configure.isClient||Configure.isServer){
+					gameState = GameState.OVER;
+					if(whetherServerWin()){
+						this.gameModel.gameOver(GameResultState.SUCCESS,false);
+					}else{
+						this.gameModel.gameOver(GameResultState.SUCCESS,true);
+					}
+				}else{
+					gameState = GameState.OVER;
+					this.gameModel.gameOver(GameResultState.SUCCESS,false);
+				}
+			}
+			if(Configure.isServer&&!block.isMine()){
+				gameState = GameState.OVER;
+				this.gameModel.gameOver(GameResultState.FAIL,true);
+			}
+			
+			super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));
+			return true;
+		}
+		
+		return false;
+	
+	}
+
+	@Override
+	public boolean excavate(int x, int y, boolean isClient) {
+
+
+		if(blockMatrix == null)
+			return false;
+		
+		List<BlockPO> blocks = new ArrayList<BlockPO>();
+		BlockPO block = blockMatrix[x][y];
+		if(block.getState() == BlockState.FLAG){
+			this.parameterModel.addMineNum();
+		}
+		block.setState(BlockState.CLICK);
+		blocks.add(block);
+		
+		GameState gameState = GameState.RUN;
+		if(block.isMine()){
+			gameState = GameState.OVER;
+			this.gameModel.gameOver(GameResultState.FAIL,true);
+		}
+		
+		int testNum = 0;
+		for(int i = 0; i < blockMatrix.length; i++){
+			for(int j = 0; j < blockMatrix[0].length; j++){
+				if(blockMatrix[i][j].getState().equals(BlockState.UNCLICK)&&!blockMatrix[i][j].isMine()){
+					testNum++;
+				}
+			}
+		}
+		if(testNum==0){
+			if(Configure.isClient||Configure.isServer){
+				gameState = GameState.OVER;
+				if(whetherServerWin()){
+					this.gameModel.gameOver(GameResultState.SUCCESS,false);
+				}else{
+					this.gameModel.gameOver(GameResultState.SUCCESS,true);
+				}
+			}else{
+				gameState = GameState.OVER;
+				this.gameModel.gameOver(GameResultState.SUCCESS,false);
+			}
+		}
+		
+		super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));			
+
+		if(block.getMineNum()==0){
+			for(int i = x-1; i <= x+1; i++){
+				for(int j = y-1; j <= y+1; j++){
+					if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.UNCLICK){
+						excavate(i, j);
+					}
+				}
+			}
+		}
+		return true;
+	
+	}
+
+	@Override
+	public boolean quickExcavate(int x, int y, boolean isClient) {
+
+		// TODO Auto-generated method stub
+		/***********请在此处完成快速挖开方法实现****************/
+		if(blockMatrix == null)
+			return false;
+		List<BlockPO> blocks = new ArrayList<BlockPO>();
+		BlockPO block = blockMatrix[x][y];
+		GameState gameState = GameState.RUN;
+		if(block.getState()==BlockState.CLICK){
+			int flagNum = 0;
+			for(int i = x-1;i <= x+1;i++){
+				for(int j = y-1; j <= y+1; j++){
+					if(!(i==x&&j==y)){
+						if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&(blockMatrix[i][j].getState()==BlockState.FLAG||blockMatrix[i][j].getState()==BlockState.FLAG2)){
+							flagNum++;
+						}
+					}
+				}
+			}
+			if(block.getMineNum()==flagNum){
+				for(int i = x-1;i <= x+1;i++){
+					for(int j = y-1; j <= y+1; j++){
+						if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.UNCLICK){
+//							blockMatrix[i][j].setState(BlockState.CLICK);
+//							blocks.add(blockMatrix[i][j]);
+//							
+//							if(blockMatrix[i][j].isMine()){
+//								this.gameModel.gameOver(GameResultState.FAIL);
+//								gameState = GameState.OVER;
+//							}
+							excavate(i, j,true);
+						}
+					}
+				}
+				super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));
+				return true;
+			}
+		}
+		
+		return false;
+	
+	}
+	
+	private boolean whetherServerWin(){
+		if(parameterModel.getFlagNum()>parameterModel.getFlagNum2()){
+			return true;
+		}
+		return false;
 	}
 }

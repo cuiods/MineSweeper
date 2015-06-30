@@ -3,6 +3,7 @@ package edu.nju.network.modelProxy;
 import java.util.Observable;
 import java.util.Observer;
 
+import edu.nju.controller.msgqueue.OperationQueue;
 import edu.nju.model.impl.BaseModel;
 import edu.nju.model.impl.UpdateMessage;
 import edu.nju.network.TransformObject;

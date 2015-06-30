@@ -72,5 +72,13 @@ public class OperationQueue implements Runnable{
 	public static GameModelService getGameModel(){
 		return gameModel;
 	}
+	
+	public static void setGameModel(GameModelService gameMode){
+		gameModel = gameMode;
+	}
+	
+	public static void setChessBoardModel(ChessBoardModelService chessModel){
+		chessBoard = chessModel;
+	}
 
 }

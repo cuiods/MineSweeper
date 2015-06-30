@@ -6,5 +6,6 @@ public class Configure {
 	
 	public final static String MSG_TYPE = "TYPE";
 	public final static String MSG_DATA = "DATA";
-	
+	public static boolean isClient = false;
+	public static boolean isServer = false;
 }

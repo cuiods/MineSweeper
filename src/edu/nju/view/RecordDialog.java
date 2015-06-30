@@ -7,14 +7,17 @@ package edu.nju.view;
 
 import java.awt.Font;
 import java.awt.Graphics;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
@@ -28,7 +31,22 @@ public class RecordDialog {
 		initialization(parent);
 	}
 
-	public boolean show(String[] names, int[] score) {
+	public boolean show(String[] names, String[] score) {
+		File test = new File("save.data");
+		String[] temp = new String[3];
+		if(test.exists()){
+			try {
+				BufferedReader br = new BufferedReader(new FileReader("save.data"));
+				for(int i = 0; i < 3; i++){
+					temp = br.readLine().split(" ");
+					names[i] = temp[0];
+					score[i] = temp[1];
+				}
+				br.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		clear = false;
 		this.names = names;
 		this.score = score;
@@ -37,9 +55,9 @@ public class RecordDialog {
 	}
 	
 	public void show(){
-		dialog.setVisible(true);
-		this.names = new String[]{"UnKnown","UnKnown","UnKnown"};
-		this.score = new int[]{999,999,999};
+		//dialog.setVisible(true);
+//		this.names = new String[]{"UnKnown","UnKnown","UnKnown"};
+//		this.score = new int[]{999,999,999};
 		show(names,score);
 	}
 
@@ -55,6 +73,9 @@ public class RecordDialog {
 				dialog.setVisible(false);
 			}
 		});
+		
+		this.names = new String[]{"UnKnown","UnKnown","UnKnown"};
+		this.score = new String[]{"0/0","0/0","0/0"};
 
 		clearBtn = new JButton("clear");
 		clearBtn.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -63,9 +84,19 @@ public class RecordDialog {
 			public void actionPerformed(ActionEvent e) {
 				clear = true;
 				int length = names.length;
+				File test = new File("save.data");
+				if(test.exists()){
+					try {
+						BufferedWriter bw = new BufferedWriter(new FileWriter("save.data"));
+						bw.write("UnKnown 0/0 Easy"+"\n"+"UnKnown 0/0 Hard"+"\n"+"UnKnown 0/0 Hell"+"\n");
+						bw.close();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
 				for (int i = 0; i != length; ++i) {
 					names[i] = "Unknow Name";
-					score[i] = 999;
+					score[i] = "0/0";
 				}
 				textPanel.repaint();
 			}
@@ -124,7 +155,7 @@ public class RecordDialog {
 
 	private String names[];
 
-	private int score[];
+	private String score[];
 
 	private JPanel textPanel;
 

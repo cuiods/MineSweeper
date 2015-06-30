@@ -20,5 +20,7 @@ public interface StatisticModelService {
 	 * @param time 游戏时间
 	 */
 	public void recordStatistic(GameResultState result, int time);
+	
+	public void recordStatistic(GameResultState result, int time,String level);
 
 }

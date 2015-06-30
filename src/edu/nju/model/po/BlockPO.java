@@ -40,6 +40,9 @@ public class BlockPO {
 		else if(state == BlockState.FLAG){
 			dbs = DisplayBlockState.FLAG;
 		}
+		else if(state == BlockState.FLAG2){
+			dbs = DisplayBlockState.FLAG2;
+		}
 		
 		if(gameState == GameState.OVER){//当游戏为结束状态时
 			if(state == BlockState.CLICK&&isMine){

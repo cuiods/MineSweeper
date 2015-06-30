@@ -6,6 +6,7 @@ import java.util.Observer;
 import javax.swing.JLabel;
 
 import edu.nju.model.impl.UpdateMessage;
+import edu.nju.network.Configure;
 
 public class MineNumberLabel extends JLabel implements Observer {
 
@@ -23,7 +24,11 @@ public class MineNumberLabel extends JLabel implements Observer {
 			
 			int remainMines = (Integer) updateMessage.getValue();
 			this.setReamainMinesNumber(remainMines);
-			this.setText(remainMines+"");
+			if(Configure.isClient||Configure.isServer){
+				this.setText("余："+remainMines);
+			}else{
+				this.setText(remainMines+"");
+			}
 		}
 
 	}

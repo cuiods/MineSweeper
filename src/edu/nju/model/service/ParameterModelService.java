@@ -26,4 +26,18 @@ public interface ParameterModelService {
 	 */
 	public boolean addMineNum();
 	
+	/**
+	 * 是否可以标记
+	 * @return
+	 */
+	public boolean canMark();
+	
+	public int getMineNum();
+	public boolean addFlagNum();
+	public int getFlagNum();
+	public void setFlagNum(int flagNum);
+	public boolean addFlagNum2();
+	public void setFlagNum2(int flagNum2);
+	public int getFlagNum2();
+	
 }

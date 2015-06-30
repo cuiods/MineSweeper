@@ -42,13 +42,18 @@ public interface GameModelService {
 	 * @param time 游戏时间
 	 * @return
 	 */
-	public boolean gameOver(GameResultState result);
+	public boolean gameOver(GameResultState result,boolean isClient);
 
 	/**
 	 * 获得游戏等级列表
 	 * @return
 	 */
 	public List<GameLevel> getGameLevel();
+	
+	/**
+	 * 获取时间
+	 */
+	public int getTime();
 
 }
 

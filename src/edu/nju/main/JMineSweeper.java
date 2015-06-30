@@ -17,9 +17,10 @@ import edu.nju.view.MainFrame;
 public class JMineSweeper {
 
 	static MenuControllerService menuController = new MenuControllerImpl();
+	static MainFrame ui = null;
 	public static void main(String[] args) {
 		
-		MainFrame ui = new MainFrame();
+		ui = new MainFrame();
 		StatisticModelImpl statisticModel = new StatisticModelImpl();
  		ParameterModelImpl mineNumberModel = new ParameterModelImpl();
  		ChessBoardModelImpl mineBoardModel = new ChessBoardModelImpl(mineNumberModel);
@@ -27,6 +28,8 @@ public class JMineSweeper {
  		
 		gameModel.addObserver(ui);
  		mineNumberModel.addObserver(ui.getMineNumberLabel());
+ 		mineNumberModel.addObserver(ui.getFlagNumLabel());
+ 		mineNumberModel.addObserver(ui.getFlagNum2Label());
  		mineBoardModel.addObserver(ui.getMineBoard());
  		
  		OperationQueue operationQueue = new OperationQueue(mineBoardModel, gameModel);
@@ -37,7 +40,11 @@ public class JMineSweeper {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
- 		menuController.startGame();
+ 		//menuController.startGame();
+	}
+	
+	public static MainFrame getUI(){
+		return ui;
 	}
 }
 

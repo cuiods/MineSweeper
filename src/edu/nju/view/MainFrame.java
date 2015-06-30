@@ -60,12 +60,14 @@ import javax.swing.UIManager;
 
 
 
+
 import edu.nju.controller.impl.MenuControllerImpl;
 import edu.nju.controller.service.MenuControllerService;
 import edu.nju.model.impl.UpdateMessage;
 import edu.nju.model.state.GameResultState;
 import edu.nju.model.vo.BlockVO;
 import edu.nju.model.vo.GameVO;
+import edu.nju.network.Configure;
 import edu.nju.view.listener.CoreListener;
 import edu.nju.view.listener.MenuListener;
 
@@ -94,8 +96,10 @@ public class MainFrame implements Observer {
 	private JMenuItem host;
 	private JMenuItem client;
 	private MineNumberLabel mineNumberLabel;
+	private FlagNumLabel flagNumLabel;
+	private FlagNum2Label flagNum2Label;
 	private JButton startButton;
-	private JLabel time;
+	private TimeLabel time;
 	private MineBoardPanel body;
 	private final int buttonSize = 16;
 	private final int bodyMarginNorth = 20;
@@ -124,8 +128,10 @@ public class MainFrame implements Observer {
 		mainFrame = new JFrame();
 		head = new JPanel();
 		mineNumberLabel = new MineNumberLabel();
+		flagNumLabel = new FlagNumLabel();
+		flagNum2Label = new FlagNum2Label();
 		startButton = new JButton();
-		time = new JLabel();
+		time = new TimeLabel();
 
 		aJMenuBar = new JMenuBar();
 		game = new JMenu();
@@ -236,15 +242,23 @@ public class MainFrame implements Observer {
         startButton.addActionListener(coreListener);
 		Font font = new Font("Serif", Font.BOLD, 12);
 		mineNumberLabel.setFont(font);
+		flagNumLabel.setFont(font);
+		flagNum2Label.setFont(font);
 		time.setFont(font);
 
 		mineNumberLabel.setHorizontalAlignment(JLabel.CENTER);
+		flagNumLabel.setHorizontalAlignment(JLabel.CENTER);
+		flagNum2Label.setHorizontalAlignment(JLabel.CENTER);
         time.setHorizontalAlignment(JLabel.CENTER);
 		
         mineNumberLabel.setText("剩余雷数");
+        flagNumLabel.setText("服务器");
+        flagNum2Label.setText("客户端");
 		time.setText("0");
 
 		head.add(mineNumberLabel);
+		head.add(flagNumLabel);
+		head.add(flagNum2Label);
 		head.add(startButton);
 		head.add(time);
 		mainFrame.getContentPane().add(head);	
@@ -264,6 +278,8 @@ public class MainFrame implements Observer {
 		startButton.setBounds((head.getWidth() - 50) / 2,
 				(head.getHeight() - 50) / 2, 50, 50);
 		mineNumberLabel.setBounds(0, 0, head.getHeight(), head.getHeight());
+		flagNumLabel.setVisible(false);
+		flagNum2Label.setVisible(false);
 		time.setBounds(head.getWidth() - head.getHeight(), 0, head.getHeight(),
 				head.getHeight());
 
@@ -312,6 +328,18 @@ public class MainFrame implements Observer {
 	public JButton getStartButton(){
 		return this.startButton;
 	}
+	public FlagNumLabel getFlagNumLabel() {
+		return flagNumLabel;
+	}
+	public void setFlagNumLabel(FlagNumLabel flagNumLabel) {
+		this.flagNumLabel = flagNumLabel;
+	}
+	public FlagNum2Label getFlagNum2Label() {
+		return flagNum2Label;
+	}
+	public void setFlagNum2Label(FlagNum2Label flagNum2Label) {
+		this.flagNum2Label = flagNum2Label;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
@@ -329,7 +357,25 @@ public class MainFrame implements Observer {
 			restart(gameHeight,gameWidth,level);
 			startButton.setIcon(Images.START_RUN);
 		}else if(notifingObject.getKey().equals("end")){
-			
+			GameVO newGame = (GameVO) notifingObject.getValue();
+			if(newGame.getGameResultStae().equals(GameResultState.FAIL)){
+				if(Configure.isClient){
+					startButton.setIcon(Images.START_BEGIN);
+					JOptionPane.showMessageDialog(new JFrame().getContentPane(), "Congratulations! You win!", "JMineSweeper", JOptionPane.INFORMATION_MESSAGE);
+				}else{
+					startButton.setIcon(Images.START_END);
+					JOptionPane.showMessageDialog(new JFrame().getContentPane(), "Sorry, game over!", "JMineSweeper", JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+			}else if(newGame.getGameResultStae().equals(GameResultState.SUCCESS)){
+				if(Configure.isClient){
+					startButton.setIcon(Images.START_END);
+					JOptionPane.showMessageDialog(new JFrame().getContentPane(), "Sorry, game over!", "JMineSweeper", JOptionPane.INFORMATION_MESSAGE);
+				}else{
+					startButton.setIcon(Images.START_BEGIN);
+					JOptionPane.showMessageDialog(new JFrame().getContentPane(), "Congratulations! You win!", "JMineSweeper", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
 		}
 	}
 
@@ -340,7 +386,15 @@ public class MainFrame implements Observer {
 		head.setBounds(4, 5, mineBoardWidth * buttonSize + bodyMarginOther * 2 - 4, 65);
 		startButton.setBounds((head.getWidth() - 50) / 2,
 				(head.getHeight() - 50) / 2, 50, 50);
-		mineNumberLabel.setBounds(0, 0, head.getHeight(), head.getHeight());
+		if(Configure.isClient||Configure.isServer){
+			mineNumberLabel.setBounds(0, 0, head.getHeight(), head.getHeight()/3);
+			flagNumLabel.setVisible(true);
+			flagNum2Label.setVisible(true);
+			flagNumLabel.setBounds(0,head.getHeight()/3,head.getHeight(),head.getHeight()/3);
+			flagNum2Label.setBounds(0,2*head.getHeight()/3,head.getHeight(),head.getHeight()/3);
+		}else{
+			mineNumberLabel.setBounds(0, 0, head.getHeight(), head.getHeight());
+		}
 		time.setBounds(head.getWidth() - head.getHeight(), 0, head.getHeight(),
 				head.getHeight());
 
@@ -355,6 +409,7 @@ public class MainFrame implements Observer {
 		mainFrame.setSize(body.getWidth() + 10, body.getHeight()
 				+ head.getHeight() + 60);
 		time.setText("0");
+		TimeLabel.setRun(true);
 		
 		if(type == null){
 			custom.setSelected(true);

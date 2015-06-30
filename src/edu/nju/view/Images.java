@@ -9,10 +9,12 @@ import java.awt.Image;
 import java.io.FileInputStream;
  
 
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 import edu.nju.model.state.DisplayBlockState;
+import edu.nju.network.Configure;
  
 public class Images {
 	/** Returns an ImageIcon, or null if the path was invalid. */
@@ -58,6 +60,8 @@ public class Images {
 	public static final ImageIcon MARKED = createImageIcon("images/MARKED.gif");
 
 	public static final ImageIcon MARKED_MINE = createImageIcon("images/MARKED_MINE.gif");
+	
+	public static final ImageIcon MARKED_MINE2 = createImageIcon("images/MARKED_MINE2.gif");
 
 	public static ImageIcon getImageIconByState(DisplayBlockState state){
 		switch (state) {
@@ -83,6 +87,8 @@ public class Images {
 			return number[7];
 		case FLAG:
 			return MARKED_MINE;
+		case FLAG2:
+			return MARKED_MINE2;
 		case MINE:
 			return MINE;
 		case Bomb:
