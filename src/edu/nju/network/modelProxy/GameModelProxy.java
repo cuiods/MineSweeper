@@ -65,30 +65,6 @@ public class GameModelProxy extends ModelProxy implements GameModelService{
 
 	@Override
 	public boolean startGame() {
-		// TODO Auto-generated method stub
-		gameState = GameState.RUN;
-		startTime = Calendar.getInstance().getTimeInMillis();
-		TimeLabel.setRun(true);
-		
-		GameLevel gl = null;
-		for(GameLevel tempLevel : levelList){
-			if(tempLevel.getName().equals(level)){
-				gl = tempLevel;
-				break;
-			}
-		}
-		if(gl == null&&width==0&&height == 0)
-			gl = levelList.get(2);
-		
-		if(gl != null){
-			height = gl.getWidth();
-			width = gl.getHeight();
-			mineNum = gl.getMineNum();
-		}
-		
-		this.chessBoardModel.initialize(width, height, mineNum);
-		
-		super.updateChange(new UpdateMessage("start",this.convertToDisplayGame()));
 		
 		MineOperation op = new StartGameOperation();
 		net.submitOperation(op);

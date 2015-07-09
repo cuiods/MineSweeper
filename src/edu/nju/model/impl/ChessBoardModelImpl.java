@@ -80,20 +80,36 @@ public class ChessBoardModelImpl extends BaseModel implements ChessBoardModelSer
 				gameState = GameState.OVER;
 				this.gameModel.gameOver(GameResultState.SUCCESS,false);
 			}
-		}
-		
-		super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));			
+		}		
 
 		if(block.getMineNum()==0){
 			for(int i = x-1; i <= x+1; i++){
 				for(int j = y-1; j <= y+1; j++){
 					if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.UNCLICK){
-						excavate(i, j);
+						excavateSmall(i, j,blocks);
 					}
 				}
 			}
 		}
+		
+		super.updateChange(new UpdateMessage("excute",this.getDisplayList(blocks, gameState)));	
 		return true;
+	}
+	
+	private void excavateSmall(int x, int y, List<BlockPO> blocks){
+		BlockPO block = blockMatrix[x][y];
+		block.setState(BlockState.CLICK);
+		blocks.add(block);
+		
+		if(block.getMineNum()==0){
+			for(int i = x-1; i <= x+1; i++){
+				for(int j = y-1; j <= y+1; j++){
+					if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.UNCLICK){
+						excavateSmall(i, j,blocks);
+					}
+				}
+			}
+		}
 	}
 	
 	
@@ -170,7 +186,7 @@ public class ChessBoardModelImpl extends BaseModel implements ChessBoardModelSer
 			for(int i = x-1;i <= x+1;i++){
 				for(int j = y-1; j <= y+1; j++){
 					if(!(i==x&&j==y)){
-						if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&blockMatrix[i][j].getState()==BlockState.FLAG){
+						if(i>=0&&i<blockMatrix.length&&j>=0&&j<blockMatrix[0].length&&(blockMatrix[i][j].getState()==BlockState.FLAG||blockMatrix[i][j].getState()==BlockState.FLAG2)){
 							flagNum++;
 						}
 					}

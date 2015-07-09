@@ -18,13 +18,16 @@ public class JMineSweeper {
 
 	static MenuControllerService menuController = new MenuControllerImpl();
 	static MainFrame ui = null;
+	static ParameterModelImpl mineNumberModel = null;
+	static GameModelImpl gameModel = null;
+	static ChessBoardModelImpl mineBoardModel = null;
 	public static void main(String[] args) {
 		
 		ui = new MainFrame();
 		StatisticModelImpl statisticModel = new StatisticModelImpl();
- 		ParameterModelImpl mineNumberModel = new ParameterModelImpl();
- 		ChessBoardModelImpl mineBoardModel = new ChessBoardModelImpl(mineNumberModel);
-		GameModelImpl gameModel = new GameModelImpl(statisticModel,mineBoardModel);		
+ 		mineNumberModel = new ParameterModelImpl();
+ 		mineBoardModel = new ChessBoardModelImpl(mineNumberModel);
+		gameModel = new GameModelImpl(statisticModel,mineBoardModel);		
  		
 		gameModel.addObserver(ui);
  		mineNumberModel.addObserver(ui.getMineNumberLabel());
@@ -46,5 +49,30 @@ public class JMineSweeper {
 	public static MainFrame getUI(){
 		return ui;
 	}
+	
+	public static ParameterModelImpl getMineNumberModel() {
+		return mineNumberModel;
+	}
+
+	public static void setMineNumberModel(ParameterModelImpl mineNumberModel) {
+		JMineSweeper.mineNumberModel = mineNumberModel;
+	}
+
+	public static GameModelImpl getGameModel() {
+		return gameModel;
+	}
+
+	public static void setGameModel(GameModelImpl gameModel) {
+		JMineSweeper.gameModel = gameModel;
+	}
+
+	public static ChessBoardModelImpl getMineBoardModel() {
+		return mineBoardModel;
+	}
+
+	public static void setMineBoardModel(ChessBoardModelImpl mineBoardModel) {
+		JMineSweeper.mineBoardModel = mineBoardModel;
+	}
+
 }
 

@@ -37,7 +37,7 @@ public class RecordDialog {
 		if(test.exists()){
 			try {
 				BufferedReader br = new BufferedReader(new FileReader("save.data"));
-				for(int i = 0; i < 3; i++){
+				for(int i = 0; i < 4; i++){
 					temp = br.readLine().split(" ");
 					names[i] = temp[0];
 					score[i] = temp[1];
@@ -67,19 +67,19 @@ public class RecordDialog {
 
 		okBtn = new JButton("ok");
 		okBtn.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		okBtn.setBounds(100, 115, 70, 23);
+		okBtn.setBounds(100, 145, 70, 23);
 		okBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dialog.setVisible(false);
 			}
 		});
 		
-		this.names = new String[]{"UnKnown","UnKnown","UnKnown"};
-		this.score = new String[]{"0/0","0/0","0/0"};
+		this.names = new String[]{"UnKnown","UnKnown","UnKnown","UnKnown"};
+		this.score = new String[]{"0/0","0/0","0/0","0/0"};
 
 		clearBtn = new JButton("clear");
 		clearBtn.setFont(new Font("Monospaced", Font.PLAIN, 12));
-		clearBtn.setBounds(192, 115, 70, 23);
+		clearBtn.setBounds(192, 145, 70, 23);
 		clearBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				clear = true;
@@ -88,7 +88,7 @@ public class RecordDialog {
 				if(test.exists()){
 					try {
 						BufferedWriter bw = new BufferedWriter(new FileWriter("save.data"));
-						bw.write("UnKnown 0/0 Easy"+"\n"+"UnKnown 0/0 Hard"+"\n"+"UnKnown 0/0 Hell"+"\n");
+						bw.write("UnKnown 0/0 Easy"+"\n"+"UnKnown 0/0 Hard"+"\n"+"UnKnown 0/0 Hell"+"\n"+"UnKnown 0/0 Hell"+"\n");
 						bw.close();
 					} catch (Exception e1) {
 						e1.printStackTrace();
@@ -103,7 +103,7 @@ public class RecordDialog {
 		});
 
 		line = new JSeparator();
-		line.setBounds(20, 105, 240, 4);
+		line.setBounds(20, 135, 240, 4);
 
 		panel = new JPanel();
 		panel.setLayout(null);
@@ -117,7 +117,7 @@ public class RecordDialog {
 
 		dialog.setContentPane(panel);
 		dialog.setBounds(parent.getLocation().x + 50,
-				parent.getLocation().y + 50, 290, 190);
+				parent.getLocation().y + 50, 290, 220);
 
 		clear = false;
 
@@ -127,7 +127,7 @@ public class RecordDialog {
 
 		DescribeTextPanel() {
 			super();
-			setBounds(0, 0, 290, 100);
+			setBounds(0, 0, 290, 130);
 		}
 
 		public void paintComponent(Graphics g) {
@@ -142,7 +142,7 @@ public class RecordDialog {
 		}
 	}
 
-	private final String[] rank = { "Easy", "Hard", "Hell" };
+	private final String[] rank = { "Easy", "Hard", "Hell","Custom"};
   	private JDialog dialog;
 
 	private JPanel panel;

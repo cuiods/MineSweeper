@@ -14,8 +14,11 @@ public class ParameterModelImpl extends BaseModel implements ParameterModelServi
 		// TODO Auto-generated method stub
 		mineNum = num;
 		maxMine = num;
-		
+		flagNum = 0;
+		flagNum2 = 0;
 		super.updateChange(new UpdateMessage("mineNum", mineNum));
+		super.updateChange(new UpdateMessage("flagNum", flagNum));
+		super.updateChange(new UpdateMessage("flagNum2", flagNum2));
 		return true;
 	}
 	

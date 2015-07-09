@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import edu.nju.controller.msgqueue.OperationQueue;
+import edu.nju.main.JMineSweeper;
 import edu.nju.network.Configure;
 
 public class ClientThread extends Thread {
@@ -39,6 +41,9 @@ public class ClientThread extends Thread {
 				System.out.println("socket connection is closed!!!");
 				this.close();
 				Configure.isClient = false;
+				Configure.isServer = false;
+				OperationQueue.setGameModel(JMineSweeper.getGameModel());
+				OperationQueue.setChessBoardModel(JMineSweeper.getMineBoardModel());
 				break;
 			}catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -64,6 +69,9 @@ public class ClientThread extends Thread {
 			out.close();
 			server.close();
 			Configure.isClient = false;
+			Configure.isServer = false;
+			OperationQueue.setGameModel(JMineSweeper.getGameModel());
+			OperationQueue.setChessBoardModel(JMineSweeper.getMineBoardModel());
 			this.interrupt();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

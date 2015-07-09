@@ -63,4 +63,5 @@ public interface ChessBoardModelService {
 	 * @param gameModel
 	 */
 	public void setGameModel(GameModelService gameModel);
+	public ParameterModelService getParameterModel();
 }

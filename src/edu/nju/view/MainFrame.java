@@ -394,6 +394,8 @@ public class MainFrame implements Observer {
 			flagNum2Label.setBounds(0,2*head.getHeight()/3,head.getHeight(),head.getHeight()/3);
 		}else{
 			mineNumberLabel.setBounds(0, 0, head.getHeight(), head.getHeight());
+			flagNumLabel.setVisible(false);
+			flagNum2Label.setVisible(false);
 		}
 		time.setBounds(head.getWidth() - head.getHeight(), 0, head.getHeight(),
 				head.getHeight());

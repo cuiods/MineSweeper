@@ -41,6 +41,7 @@ public class HostThread extends Thread {
 			} catch(SocketException se){
 				System.out.println("socket connection is closed!!!");
 				Configure.isServer = false;
+				Configure.isClient = false;
 				this.close();
 				break;
 			}catch (IOException e1) {
@@ -69,6 +70,7 @@ public class HostThread extends Thread {
 			client.close();
 			server.close();
 			Configure.isServer = false;
+			Configure.isClient = false;
 			this.interrupt();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -49,6 +49,8 @@ public class GameModelImpl extends BaseModel implements GameModelService{
 		// TODO Auto-generated method stub
 		gameState = GameState.RUN;
 		startTime = Calendar.getInstance().getTimeInMillis();
+		chessBoardModel.getParameterModel().setFlagNum(0);
+		chessBoardModel.getParameterModel().setFlagNum2(0);
 		TimeLabel.setRun(true);
 		
 		GameLevel gl = null;

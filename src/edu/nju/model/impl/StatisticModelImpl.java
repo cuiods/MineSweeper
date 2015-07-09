@@ -36,26 +36,27 @@ public class StatisticModelImpl extends BaseModel implements StatisticModelServi
 		//StatisticPO statistic = new StatisticPO();
 		BufferedWriter bw = null;
 		BufferedReader br = null;
-		String[] names = new String[3];
-		String[] scores = new String[3];
+		String[] names = new String[4];
+		String[] scores = new String[4];
 		String[] temp1 = new String[3];
 		String[] temp2 = new String[2];
 		boolean isWin = result.equals(GameResultState.SUCCESS);
 		int levelIndex = 0;
 		if(level.equals("中")){levelIndex=1;}
 		else if(level.equals("大")){levelIndex=2;}
+		else if(level.equals(" ")){levelIndex=3;}
 		try {
 			File recordFile = new File("save.data");
 			if(!recordFile.exists()){
 				recordFile.createNewFile();
 				BufferedWriter temp = new BufferedWriter(new FileWriter("save.data"));
-				temp.write("UnKnown 0/0 Easy"+"\n"+"UnKnown 0/0 Hard"+"\n"+"UnKnown 0/0 Hell"+"\n");
+				temp.write("UnKnown 0/0 Easy"+"\n"+"UnKnown 0/0 Hard"+"\n"+"UnKnown 0/0 Hell"+"\n"+"UnKnown 0/0 Custom"+"\n");
 				temp.close();
 			}
 			
 			
 			br = new BufferedReader(new FileReader("save.data"));
-			for(int i = 0; i < 3; i++){
+			for(int i = 0; i < 4; i++){
 				temp1 = br.readLine().split(" ");
 				names[i] = temp1[0];
 				scores[i] = temp1[1];
@@ -74,6 +75,7 @@ public class StatisticModelImpl extends BaseModel implements StatisticModelServi
 			bw.write(names[0]+" "+scores[0]+" "+"Easy"+"\n");
 			bw.write(names[1]+" "+scores[1]+" "+"Hard"+"\n");
 			bw.write(names[2]+" "+scores[2]+" "+"Hell"+"\n");
+			bw.write(names[3]+" "+scores[3]+" "+"Custom"+"\n");
 			bw.close();
 			
 //			System.out.println(names[0]+" "+scores[0]+" "+"Easy"+"\n");

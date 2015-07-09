@@ -189,5 +189,10 @@ public class ChessBoardModelProxy extends ModelProxy implements ChessBoardModelS
 		net.submitOperation(op);
 		return true;
 	}
+	@Override
+	public ParameterModelService getParameterModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
